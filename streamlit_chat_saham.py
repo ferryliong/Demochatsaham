@@ -97,12 +97,7 @@ if "data_csv_string" in st.session_state:
         st.code(csv_data_string, language="markdown")
         
 st.subheader("Bar Chart")
-st.write("""
-`st.bar_chart()` displays a bar chart, useful for comparing quantities across categories.
-""")
-bar_data = pd.DataFrame(
-    np.random.rand(5, 2), columns=["apples", "bananas"]
-)
+bar_data = pd.DataFrame(uploaded_file, encoding='utf-8')
 st.bar_chart(bar_data)
 
 
