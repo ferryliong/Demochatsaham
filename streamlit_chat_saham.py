@@ -117,6 +117,10 @@ if prompt:
                 genai.types.Content(role=msg["role"], parts=parts)
             )
 
+       # Add these lines immediately before the failing line
+            print(f"Parts type: {type(parts)}")
+            print(f"Parts value: {parts}")
+
     # Tambahkan input user yang baru (sudah ada di user_content_parts)
     # Kami akan menggunakan generate_content, bukan send_message
 
