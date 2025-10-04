@@ -98,7 +98,7 @@ st.subheader("Bar Chart")
 st.write("""
 `st.bar_chart()` displays a bar chart, useful for comparing quantities across categories.
 """)
-bar_data = pd.DataFrame(st.session_state.data_csv)
+bar_data = st.session_state.data_csv
 st.bar_chart(bar_data)
 
 
