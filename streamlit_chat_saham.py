@@ -126,6 +126,9 @@ if prompt:
                 st.markdown(part)
             else:
                 st.image(part, caption="User Upload")
+        api_history.append(
+                genai.types.Content(role=msg["role"], parts=parts)
+            )
     
     # Panggil generate_content (BUKAN send_message)
     try:
