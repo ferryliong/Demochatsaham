@@ -114,7 +114,7 @@ if prompt:
                 parts.append(msg["image"])
                 
             api_history.append(
-                genai.types.Content(role=msg["role"], parts=parts)
+                genai.types.Content(role="user", parts=user_content_parts)
             )
 
 
