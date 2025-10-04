@@ -113,10 +113,6 @@ if prompt:
             if "image" in msg:
                 parts.append(msg["image"])
                 
-            contents=api_history[:-len(user_content_parts)] + [
-    genai.types.Content(role="user", parts=user_content_parts)
-]
-
 
     # Tambahkan input user yang baru (sudah ada di user_content_parts)
     # Kami akan menggunakan generate_content, bukan send_message
