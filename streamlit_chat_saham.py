@@ -20,13 +20,13 @@ with st.sidebar:
     st.subheader("Settings")
     
     # Create a text input field for the Google AI API Key.
-    google_api_key = st.text_input("Google AI API Key", type="password")
+    google_api_key = st.text_input("Masukan Goggle API key anda", type="password")
     
     # Add File Uploader for CSV
     st.subheader("Upload Data CSV")
     # File uploader widget that accepts CSV files
     uploaded_file = st.file_uploader(
-        "Pilih file CSV untuk dianalisis (Maks 10MB)", 
+        "bisa menggunkan data .csv dari investing.com (Maks 10MB)", 
         type=["csv"],
         help="Data CSV akan dikirimkan ke Gemini sebagai tabel teks."
     )
