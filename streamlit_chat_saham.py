@@ -4,6 +4,8 @@ from google import genai  # For interacting with the Google Gemini API
 import pandas as pd # Import Pandas for CSV handling
 import io # Import io for reading file content
 import numpy as np
+import pandas as pd
+from lightweight_charts.widgets import StreamlitChart
 
 
 # --- 1. Page Configuration and Title ---
@@ -94,6 +96,13 @@ if "data_csv_string" in st.session_state:
     with st.expander(f"Pratinjau Data CSV ({st.session_state.data_csv})"):
         st.code(csv_data_string, language="markdown")
         
+chart = StreamlitChart(width=900, height=600)
+
+df = pd.read_csv('st.session_state.data_csv')
+chart.set(df)
+
+chart.load()
+
 
 # --- 5. Chat History Management ---
 
