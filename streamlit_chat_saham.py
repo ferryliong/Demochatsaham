@@ -3,12 +3,13 @@ import streamlit as st  # For creating the web app interface
 from google import genai  # For interacting with the Google Gemini API
 import pandas as pd # Import Pandas for CSV handling
 import io # Import io for reading file content
+import numpy as np
 
 # --- 1. Page Configuration and Title ---
 
 # Set the title and a caption for the web page
-st.title("💬 Gemini Chatbot (dengan CSV Analysis)")
-st.caption("A simple and friendly chat using Google's Gemini Flash model")
+st.title("💬 Cek saham dengan .csv (gemini csv analysis)")
+st.caption(" * untuk dapat di perhatikan analysis ini berdasarkan data yang di input")
 
 # --- 2. Sidebar for Settings ---
 
@@ -35,7 +36,7 @@ with st.sidebar:
 # --- 3. API Key and Client Initialization ---
 
 if not google_api_key:
-    st.info("Please add your Google AI API key in the sidebar to start chatting.", icon="🗝️")
+    st.info("Masukan API KEY Gemini Kalian, Lalu di enter", icon="🗝️")
     st.stop()
 
 # --- Initialization Logic ---
@@ -63,8 +64,8 @@ if uploaded_file and ("data_csv" not in st.session_state or st.session_state.dat
         df = pd.read_csv(uploaded_file, encoding='utf-8')
 
         # Limit to the first 10 rows and 8 columns to save tokens and prevent massive inputs
-        max_rows = 10
-        max_cols = 8
+        max_rows = 30
+        max_cols = 20
         if df.shape[0] > max_rows or df.shape[1] > max_cols:
             st.warning(f"File terlalu besar. Hanya mengambil {max_rows} baris pertama dan {max_cols} kolom pertama.")
             df_display = df.iloc[:max_rows, :max_cols]
@@ -85,12 +86,13 @@ if uploaded_file and ("data_csv" not in st.session_state or st.session_state.dat
         st.session_state.pop("data_csv", None)
         st.session_state.pop("data_csv_string", None)
 
-# Set the csv data string for the current run if it exists in session state
+# 4.1 Set the csv data string for the current run if it exists in session state
 if "data_csv_string" in st.session_state:
     csv_data_string = st.session_state.data_csv_string
     # Tampilkan pratinjau data yang dimuat
     with st.expander(f"Pratinjau Data CSV ({st.session_state.data_csv})"):
         st.code(csv_data_string, language="markdown")
+        
 
 # --- 5. Chat History Management ---
 
