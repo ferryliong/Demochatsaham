@@ -113,9 +113,9 @@ if prompt:
             if "image" in msg:
                 parts.append(msg["image"])
                 
-            api_history.append(
-                genai.types.Content(role="user", parts=user_content_parts)
-            )
+            contents=api_history[:-len(user_content_parts)] + [
+    genai.types.Content(role="user", parts=user_content_parts)
+]
 
 
     # Tambahkan input user yang baru (sudah ada di user_content_parts)
