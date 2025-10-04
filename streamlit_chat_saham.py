@@ -1,11 +1,9 @@
 # Import the necessary libraries
-import streamlit as st  # For creating the web app interface
-from google import genai  # For interacting with the Google Gemini API
+import streamlit as st # For creating the web app interface
+from google import genai # For interacting with the Google Gemini API
 import pandas as pd # Import Pandas for CSV handling
 import io # Import io for reading file content
 import numpy as np
-import pandas as pd
-
 
 
 # --- 1. Page Configuration and Title ---
@@ -35,6 +33,17 @@ with st.sidebar:
     
     # Create a button to reset the conversation.
     reset_button = st.button("Reset Conversation", help="Clear all messages and start fresh")
+    
+    # --- Tambahan untuk Menampilkan Total Token yang Digunakan ---
+    if "total_tokens_used" not in st.session_state:
+        st.session_state.total_tokens_used = 0
+    
+    # Tampilkan total token yang digunakan di sidebar
+    st.markdown("---")
+    st.subheader("Penggunaan Token")
+    st.info(f"Total Token Digunakan: **{st.session_state.total_tokens_used}**")
+    # -----------------------------------------------------------
+
 
 # --- 3. API Key and Client Initialization ---
 
@@ -50,7 +59,9 @@ if ("genai_client" not in st.session_state) or (getattr(st.session_state, "_last
         st.session_state.pop("chat", None)
         st.session_state.pop("messages", None)
         # Tambahkan pembersihan data CSV di session state
-        st.session_state.pop("data_csv", None) 
+        st.session_state.pop("data_csv", None)
+        # Reset token counter saat API key baru diinput
+        st.session_state.total_tokens_used = 0 
     except Exception as e:
         st.error(f"Invalid API Key: {e}")
         st.stop()
@@ -96,6 +107,7 @@ if "data_csv_string" in st.session_state:
     with st.expander(f"Pratinjau Data CSV ({st.session_state.data_csv})"):
         st.code(csv_data_string, language="markdown")
         
+
 # --- 5. Chat History Management ---
 
 # Initialize the chat session if it doesn't already exist in memory.
@@ -112,15 +124,20 @@ if reset_button:
     st.session_state.pop("messages", None)
     st.session_state.pop("data_csv", None) # Clear data state
     st.session_state.pop("data_csv_string", None) # Clear data string
+    st.session_state.total_tokens_used = 0 # Reset token counter
     st.rerun()
 
 # --- 6. Display Past Messages ---
 
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
+        # Tambahkan tampilan token di bawah pesan asisten
         st.markdown(msg["content"])
+        if "token_info" in msg:
+            st.caption(msg["token_info"])
 
-# --- 7. Handle User Input and API Communication ---
+
+# --- 7. Handle User Input and API Communication (MODIFIKASI DI SINI) ---
 
 prompt = st.chat_input("Type your message here...")
 
@@ -147,6 +164,20 @@ if prompt:
 
     # 4. Get the assistant's response.
     try:
+        
+        # --- Token Counter (Input) ---
+        # Menghitung token untuk prompt saat ini sebelum dikirim
+        try:
+            input_token_count_response = st.session_state.genai_client.models.count_tokens(
+                model="gemini-2.5-flash",
+                contents=[{"role": "user", "parts": [{"text": full_prompt}]}]
+            )
+            input_token_count = input_token_count_response.total_tokens
+        except Exception as e:
+            input_token_count = "N/A"
+            st.warning(f"Gagal menghitung token input: {e}")
+        # -----------------------------
+
         # Send the FULL_PROMPT (which may include the CSV data) to the Gemini API.
         response = st.session_state.chat.send_message(full_prompt)
         
@@ -155,12 +186,41 @@ if prompt:
         else:
             answer = str(response)
 
+        # --- Token Counter (Output & Total) ---
+        # Dapatkan informasi penggunaan token dari respons
+        usage_metadata = response.usage_metadata
+        
+        prompt_tokens = usage_metadata.prompt_token_count
+        completion_tokens = usage_metadata.candidates_token_count
+        total_tokens = usage_metadata.total_token_count
+        
+        # Update total token yang digunakan di session state
+        st.session_state.total_tokens_used += total_tokens
+        
+        # Buat string informasi token
+        token_info = (
+            f"**Token Usage:** Input: {prompt_tokens}, Output: {completion_tokens}, Total: {total_tokens}"
+        )
+        # -------------------------------------
+
+
     except Exception as e:
         answer = f"An error occurred: {e}"
+        token_info = "Token information not available due to error."
+
 
     # 5. Display the assistant's response.
     with st.chat_message("assistant"):
         st.markdown(answer)
+        st.caption(token_info) # Tampilkan informasi token di bawah pesan asisten
     
     # 6. Add the assistant's response to the message history list.
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+    # Simpan informasi token bersama dengan pesan asisten
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": answer,
+        "token_info": token_info
+    })
+    
+    # Rerun untuk memperbarui tampilan total token di sidebar
+    st.rerun()
