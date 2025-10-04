@@ -28,7 +28,7 @@ if not google_api_key:
     st.warning("Please add your Google AI API key in the sidebar to start chatting.", icon="🗝️")
     st.stop()
 
-# --- Initialization Logic ---
+# --- Initialization Logic ---#
 if ("genai_client" not in st.session_state) or (getattr(st.session_state, "_last_key", None) != google_api_key):
     try:
         st.session_state.genai_client = genai.Client(api_key=google_api_key)
@@ -40,10 +40,8 @@ if ("genai_client" not in st.session_state) or (getattr(st.session_state, "_last
         st.error(f"Invalid API Key: {e}")
         st.stop()
 
-# --- 3. Chat Session and History Management ---
+# --- 3. Chat Session and History Management ---#
 
-# Kami tidak lagi bergantung pada st.session_state.chat_session untuk mengirim pesan.
-# Kami hanya menggunakannya untuk mendapatkan model
 if "messages" not in st.session_state:
     st.session_state.messages = []
     
