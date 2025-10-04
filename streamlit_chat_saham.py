@@ -97,7 +97,7 @@ if "data_csv_string" in st.session_state:
         st.code(csv_data_string, language="markdown")
         
     st.subheader("Bar Chart")
-    bar_data = pd.DataFrame(st.session_state.data_csv_string)
+    bar_data = pd.DataFrame(df_display.to_markdown)
     st.bar_chart(bar_data)
 
 
