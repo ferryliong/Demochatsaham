@@ -4,7 +4,7 @@ from google import genai  # For interacting with the Google Gemini API
 import pandas as pd # Import Pandas for CSV handling
 import io # Import io for reading file content
 import numpy as np
-import tabulate as tabulate
+
 
 # --- 1. Page Configuration and Title ---
 
