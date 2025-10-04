@@ -5,7 +5,7 @@ import pandas as pd # Import Pandas for CSV handling
 import io # Import io for reading file content
 import numpy as np
 import pandas as pd
-from lightweight_charts.widgets import StreamlitChart
+
 
 
 # --- 1. Page Configuration and Title ---
@@ -96,12 +96,15 @@ if "data_csv_string" in st.session_state:
     with st.expander(f"Pratinjau Data CSV ({st.session_state.data_csv})"):
         st.code(csv_data_string, language="markdown")
         
-chart = StreamlitChart(width=900, height=600)
+st.subheader("Bar Chart")
+st.write("""
+`st.bar_chart()` displays a bar chart, useful for comparing quantities across categories.
+""")
+bar_data = pd.DataFrame(
+    np.random.rand(5, 2), columns=["apples", "bananas"]
+)
+st.bar_chart(bar_data)
 
-df = pd.read_csv('csv_markdown')
-chart.set(df)
-
-chart.load()
 
 
 # --- 5. Chat History Management ---
