@@ -98,7 +98,7 @@ if "data_csv_string" in st.session_state:
         
 chart = StreamlitChart(width=900, height=600)
 
-df = pd.read_csv('st.session_state.data_csv')
+df = pd.read_csv('data_csv')
 chart.set(df)
 
 chart.load()
