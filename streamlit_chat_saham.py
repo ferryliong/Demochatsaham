@@ -99,21 +99,41 @@ if prompt:
     # --- START: Logic PENGHITUNGAN TOKEN BARU ---
     
     # 4. Konversi riwayat chat ke format 'Contents' yang dibutuhkan generate_content
-    # Riwayat chat sebelumnya perlu digabungkan dengan input user baru
     api_history = []
     
     # Transformasi riwayat yang sudah ada
     for msg in st.session_state.messages:
-        # Hanya tambahkan riwayat yang sudah ada, HINDARI input user yang baru saja ditambahkan
+        
+        # NOTE ON RERUN: Since you use st.rerun(), the new user input is already 
+        # in st.session_state.messages. The API call logic handles
+        # the duplication, so we just focus on correct formatting here.
+        
+        # Only process messages that have content
         if "text" in msg or "image" in msg:
-            # Riwayat dari session state (text dan image)
             parts = []
+            
+            # --- FIX FOR PYDANTIC VALIDATION ERROR ---
+            
+            # 1. Add Text Part
             if "text" in msg and msg["text"]:
+                # Text (str) is automatically converted to a TextPart
                 parts.append(msg["text"])
-            if "image" in msg:
+            
+            # 2. Add Image Part
+            if "image" in msg and isinstance(msg["image"], Image.Image):
+                # The PIL Image object is stored in session state.
+                # We append the PIL Image object. The genai.types.Content constructor 
+                # (via Pydantic) should convert the PIL Image into a Part.
+                # This direct appending usually works and is the cleanest way.
                 parts.append(msg["image"])
-                
-
+            # --- END OF FIX ---
+            
+            # Append only if parts is not empty
+            if parts:
+                api_history.append(
+                    # This line is where the validation failed before
+                    genai.types.Content(role=msg["role"], parts=parts)
+                )
     # Tambahkan input user yang baru (sudah ada di user_content_parts)
     # Kami akan menggunakan generate_content, bukan send_message
 
@@ -126,9 +146,6 @@ if prompt:
                 st.markdown(part)
             else:
                 st.image(part, caption="User Upload")
-        api_history.append(
-                genai.types.Content(role=msg["role"], parts=parts)
-            )
     
     # Panggil generate_content (BUKAN send_message)
     try:
