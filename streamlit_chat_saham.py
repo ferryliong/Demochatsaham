@@ -96,9 +96,9 @@ if "data_csv_string" in st.session_state:
     with st.expander(f"Pratinjau Data CSV ({st.session_state.data_csv})"):
         st.code(csv_data_string, language="markdown")
         
-st.subheader("Bar Chart")
-bar_data = pd.DataFrame(uploaded_file.name)
-st.bar_chart(bar_data)
+    st.subheader("Bar Chart")
+    bar_data = pd.DataFrame(st.code)
+    st.bar_chart(bar_data)
 
 
 
